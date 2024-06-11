@@ -10,9 +10,8 @@ class User:
     def setup(self):
         try:
             if not os.path.isfile(self.filename):
-                with open(self.filename, 'w', newline='') as f:
-                    writer = csv.writer(f)
-                    writer.writerow(['username', 'hashed_password', 'user_type'])
+                with open(self.filename, 'w') as f:
+                    f.write('username,hashed_password,user_type\n')
         except Exception as e:
             print(f"An error occurred while setting up the file: {e}")
 
@@ -22,25 +21,25 @@ class User:
     def sign_up(self, username, password, user_type):
         self.setup()
         try:
-            with open(self.filename, 'a', newline='') as f:
-                writer = csv.writer(f)
+            with open(self.filename, 'a') as f:
                 hashed_password = self.hash_password(password)
-                writer.writerow([username, hashed_password, user_type])
+                f.write(f"{username},{hashed_password},{user_type}\n")
             print(f"User '{username}' registered successfully.")
         except Exception as e:
-            print(f"An error occurred while signing up: {e}") 
+            print(f"An error occurred while signing up: {e}")
 
     def login(self, username, password):
+        hashed_password = self.hash_password(password)
         try:
             with open(self.filename, 'r') as f:
-                reader = csv.DictReader(f)
-                for row in reader:
-                    stored_username = row['username']
-                    stored_password = row['hashed_password']
-                    stored_user_type = row['user_type']
-                    if stored_username == username and self.hash_password(password) == stored_password:
-                        self.current_user = username
+                f.readline()  # Skip the header
+                for line in f:
+                    stored_username, stored_password, stored_user_type = line.strip().split(',')
+                    # Add the debug statement here
+                    print(f"Debug: Checking {stored_username} == {username} and {stored_password} == {hashed_password}")
+                    if stored_username == username and stored_password == hashed_password:
                         print("Login successful")
+                        self.current_user = username
                         return stored_user_type
                 print("Username or password incorrect")
         except Exception as e:
