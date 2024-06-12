@@ -64,17 +64,4 @@ class User:
         else:
             print("No user is logged in.")
 
-# Testing the code
-if __name__ == "__main__":
-    user_manager = User()
-    
-    # Test signing up a new user
-    user_manager.sign_up("sam", "sam123", "job_seeker")
-    
-    # Test logging in with the new user
-    user_type = user_manager.login("sam", "sam123")
-    if user_type:
-        print(f"Logged in as {user_type}")
 
-    # Test logging out
-    user_manager.logout()

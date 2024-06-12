@@ -1,6 +1,9 @@
 import csv
 import os
 
+from application import Application
+from vacancy import Vacancy
+
 class Profile:
     def __init__(self, filename, fieldnames):
         self.filename = filename
@@ -48,22 +51,12 @@ class Profile:
             print(f"An error occurred while searching the profiles: {e}")
         return matching_profiles
 
-    # def view_profile(self, username):
-    #     try:
-    #         with open(self.filename, 'r') as f:
-    #             reader = csv.DictReader(f)
-    #             for row in reader:
-    #                 if row['username'] == username:
-    #                     return row
-    #         print(f"Profile for '{username}' not found.")
-    #     except Exception as e:
-    #         print(f"An error occurred while viewing the profile: {e}")
-    #     return None
 
 class JobSeekerProfile(Profile):
     def __init__(self, filename='job_seekers_profiles.csv'):
         fieldnames = ['username', 'job_type', 'salary', 'education', 'experience']
         super().__init__(filename, fieldnames)
+        self.application_manager = Application()
 
     def view_profile(self, username):
         try:
@@ -77,10 +70,25 @@ class JobSeekerProfile(Profile):
             print(f"An error occurred while viewing the profile: {e}")
         return None
 
+    def view_applied_jobs(self, job_seeker_username):
+        applications = []
+        try:
+            with open(self.application_manager.filename, 'r') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row['job_seeker_username'] == job_seeker_username:
+                        applications.append(row)
+        except Exception as e:
+            print(f"An error occurred while viewing applications: {e}")
+        return applications
+
+    
 class EmployerProfile(Profile):
     def __init__(self, filename='employers_profiles.csv'):
         fieldnames = ['username', 'company_name', 'job_openings', 'location', 'industry', 'offered_salary']
         super().__init__(filename, fieldnames)
+        self.vacancy_manager = Vacancy()
+        self.application_manager = Application()
 
     def view_profile(self, username):
         try:
@@ -93,4 +101,26 @@ class EmployerProfile(Profile):
         except Exception as e:
             print(f"An error occurred while viewing the profile: {e}")
         return None
+    
+    def add_vacancy(self, employer_username, job_title, job_description, location, salary, requirements):
+        vacancy_data = {
+            'employer_username': employer_username,
+            'job_title': job_title,
+            'job_description': job_description,
+            'location': location,
+            'salary': salary,
+            'requirements': requirements
+        }
+        self.vacancy_manager.add_vacancy(vacancy_data)
+
+    def update_vacancy(self, employer_username, job_title, vacancy_updates):
+        self.vacancy_manager.update_vacancy(employer_username, job_title, vacancy_updates)
+
+    def view_vacancies(self, employer_username):
+        return self.vacancy_manager.view_vacancies(employer_username)
+
+    def view_applications(self, employer_username):
+        return self.application_manager.view_applications(employer_username)
+    
+
 
