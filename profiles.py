@@ -48,12 +48,49 @@ class Profile:
             print(f"An error occurred while searching the profiles: {e}")
         return matching_profiles
 
+    # def view_profile(self, username):
+    #     try:
+    #         with open(self.filename, 'r') as f:
+    #             reader = csv.DictReader(f)
+    #             for row in reader:
+    #                 if row['username'] == username:
+    #                     return row
+    #         print(f"Profile for '{username}' not found.")
+    #     except Exception as e:
+    #         print(f"An error occurred while viewing the profile: {e}")
+    #     return None
+
 class JobSeekerProfile(Profile):
     def __init__(self, filename='job_seekers_profiles.csv'):
         fieldnames = ['username', 'job_type', 'salary', 'education', 'experience']
         super().__init__(filename, fieldnames)
 
+    def view_profile(self, username):
+        try:
+            with open(self.filename, 'r') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row['username'] == username:
+                        return row
+            print(f"Profile for '{username}' not found.")
+        except Exception as e:
+            print(f"An error occurred while viewing the profile: {e}")
+        return None
+
 class EmployerProfile(Profile):
     def __init__(self, filename='employers_profiles.csv'):
-        fieldnames = ['username', 'company_name', 'job_openings', 'location', 'industry']
+        fieldnames = ['username', 'company_name', 'job_openings', 'location', 'industry', 'offered_salary']
         super().__init__(filename, fieldnames)
+
+    def view_profile(self, username):
+        try:
+            with open(self.filename, 'r') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row['username'] == username:
+                        return row
+            print(f"Profile for '{username}' not found.")
+        except Exception as e:
+            print(f"An error occurred while viewing the profile: {e}")
+        return None
+

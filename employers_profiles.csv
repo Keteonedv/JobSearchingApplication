@@ -1,1 +1,2 @@
-username,company_name,job_openings,location,industry
+username,company_name,job_openings,location,industry,offered_salary
+bill_gates,Microsoft,hardware developer,washington,technology,100000
