@@ -21,23 +21,17 @@ class Profile:
 
     def update_profile(self, username, profile_updates):
         profiles = {}
-
-        # Read existing profiles into a dictionary
         with open(self.filename, 'r') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 profiles[row['username']] = row
-
-        # Update the profile if the username matches
         if username in profiles:
             profiles[username].update(profile_updates)
-
-            # Write back updated profiles
             with open(self.filename, 'w', newline='') as f:
                 writer = csv.DictWriter(f, fieldnames=self.fieldnames)
                 writer.writeheader()
-                for user, info in profiles.items():
-                    writer.writerow(info)
+                for profile in profiles.values():
+                    writer.writerow(profile)
             print(f"Profile for '{username}' updated successfully.")
         else:
             print(f"User '{username}' not found.")
@@ -54,14 +48,12 @@ class Profile:
             print(f"An error occurred while searching the profiles: {e}")
         return matching_profiles
 
-
 class JobSeekerProfile(Profile):
-    def __init__(self, filename='job_seekers.csv'):
+    def __init__(self, filename='job_seekers_profiles.csv'):
         fieldnames = ['username', 'job_type', 'salary', 'education', 'experience']
         super().__init__(filename, fieldnames)
 
-
 class EmployerProfile(Profile):
-    def __init__(self, filename='employers.csv'):
-        fieldnames = ['username', 'company_name', 'industry', 'location', 'job_openings']
+    def __init__(self, filename='employers_profiles.csv'):
+        fieldnames = ['username', 'company_name', 'job_openings', 'location', 'industry']
         super().__init__(filename, fieldnames)

@@ -1,53 +1,80 @@
 import csv
+import hashlib
 import os
 
 class User:
     def __init__(self, filename='users.csv'):
         self.filename = filename
         self.current_user = None
-        self.setup()
+        self._create_file_if_not_exists()
 
-    def setup(self):
-        try:
-            if not os.path.isfile(self.filename):
-                with open(self.filename, 'w') as f:
-                    f.write('username,hashed_password,user_type\n')
-        except Exception as e:
-            print(f"An error occurred while setting up the file: {e}")
+    def _create_file_if_not_exists(self):
+        if not os.path.isfile(self.filename):
+            print(f"Debug: File {self.filename} does not exist. Creating file.")
+            with open(self.filename, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(['username', 'hashed_password', 'user_type'])
+        else:
+            print(f"Debug: File {self.filename} already exists.")
 
-    def hash_password(self, password):
-        return str(hash(password))
+    def _hash_password(self, password):
+        return hashlib.sha256(password.encode()).hexdigest()
 
     def sign_up(self, username, password, user_type):
-        self.setup()
+        if not username or not password or not user_type:
+            print("Username, password, and user type are required.")
+            return
+
         try:
-            with open(self.filename, 'a') as f:
-                hashed_password = self.hash_password(password)
-                f.write(f"{username},{hashed_password},{user_type}\n")
+            hashed_password = self._hash_password(password)
+            print(f"Debug: Writing user '{username}' to file.")
+            with open(self.filename, 'a', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow([username, hashed_password, user_type])
             print(f"User '{username}' registered successfully.")
+        except csv.Error as e:
+            print(f"An error occurred while writing to the CSV file: {e}")
         except Exception as e:
-            print(f"An error occurred while signing up: {e}")
+            print(f"An unexpected error occurred: {e}")
 
     def login(self, username, password):
-        hashed_password = self.hash_password(password)
         try:
+            hashed_password = self._hash_password(password)
             with open(self.filename, 'r') as f:
-                f.readline()  # Skip the header
-                for line in f:
-                    stored_username, stored_password, stored_user_type = line.strip().split(',')
-                    # Add the debug statement here
+                reader = csv.reader(f)
+                next(reader)  # Skip the header
+                for row in reader:
+                    if len(row) != 3:
+                        print(f"Debug: Malformed line: {','.join(row)}")
+                        continue
+                    stored_username, stored_password, stored_user_type = row
                     print(f"Debug: Checking {stored_username} == {username} and {stored_password} == {hashed_password}")
                     if stored_username == username and stored_password == hashed_password:
-                        print("Login successful")
                         self.current_user = username
+                        print("Login successful")
                         return stored_user_type
-                print("Username or password incorrect")
+            print("Username or password incorrect")
         except Exception as e:
             print(f"An error occurred while logging in: {e}")
 
     def logout(self):
-        if self.current_user is not None:
+        if self.current_user:
             print(f"User '{self.current_user}' logged out.")
             self.current_user = None
         else:
             print("No user is logged in.")
+
+# Testing the code
+if __name__ == "__main__":
+    user_manager = User()
+    
+    # Test signing up a new user
+    user_manager.sign_up("sam", "sam123", "job_seeker")
+    
+    # Test logging in with the new user
+    user_type = user_manager.login("sam", "sam123")
+    if user_type:
+        print(f"Logged in as {user_type}")
+
+    # Test logging out
+    user_manager.logout()
