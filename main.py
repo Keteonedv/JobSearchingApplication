@@ -5,15 +5,13 @@ from profiles import JobSeekerProfile, EmployerProfile
 from vacancy import Vacancy
 from application import Application 
 
-def main():
-    user_manager = User()
-    job_seeker_profile_manager = JobSeekerProfile()
-    employer_profile_manager = EmployerProfile()
 
+def main():
     while True:
-        print("\n1. Sign Up")
-        print("2. Log In")
-        print("3. Log Out")
+        print("Menu:")
+        print("1. Register")
+        print("2. Login")
+        print("3. Logout")
         print("4. Update Profile")
         print("5. View Profile")
         print("6. Add Vacancy")
@@ -22,7 +20,9 @@ def main():
         print("9. View Applications")
         print("10. View Applied Jobs")
         print("11. Exit")
+        
         choice = input("Enter your choice: ")
+        print(f"Debug: User entered choice {choice}")  # Debug statement
 
         if choice == '1':
             try:
@@ -220,3 +220,6 @@ def main():
 
         if __name__ == "__main__":
             main()
+
+
+
